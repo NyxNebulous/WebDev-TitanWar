@@ -1,3 +1,136 @@
 body{
-    background-color: #FFA896;
+    background-image: url("Assets/Lofi_Aesthetic.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.position {
+    cursor: pointer;
+    transition: fill 0.2s;
+}
+.position:hover {
+    stroke-width: 5px;
+    stroke:rgb(23, 235, 94);
+}
+
+#window{
+    display: flex; 
+    justify-content:space-evenly;
+    margin-top: 58px;
+    height: 84vh;
+}
+
+#svg{
+    stroke:aqua;
+}
+
+#game-status {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    font-weight: bold;
+    background: rgba(250, 254, 255, 0.9);
+    padding: 10px;
+    border: 10px solid #000000;
+    border-radius: 5px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 10 10 10px rgba(0,0,0,0.2);
+}
+
+#scoreR{
+    position: fixed;
+    bottom: 10%;
+    left: 30%;
+    font-weight: bold;
+    background: rgba(250, 254, 255, 0.9);
+    width:130px;
+    text-align: center;
+    padding: 10px;
+    border: 10px solid #000000;
+    border-radius: 5px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 10 10 10px rgba(0,0,0,0.2);
+}
+
+#scoreB{
+    position: fixed;
+    bottom: 10%;
+    right: 30%;
+    font-weight: bold;
+    width:130px;
+    text-align: center;
+    background: rgba(250, 254, 255, 0.9);
+    padding: 10px;
+    border: 10px solid #000000;
+    border-radius: 5px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 10 10 10px rgba(0,0,0,0.2);
+}
+
+#timer{
+    position: fixed;
+    top: 30px;
+    right:30px;
+    justify-content: center;
+    font-weight: bold;
+    background: rgba(250, 254, 255, 0.9);
+    padding: 10px;
+    border: 10px solid #000000;
+    border-radius: 5px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 10 10 10px rgba(0,0,0,0.2);
+}
+
+#gametime-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    height:50px;
+}
+#gametime{
+    position: fixed;
+    width: 150px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 55px;
+    padding: 10px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.highlight-option {
+    stroke: rgb(255, 255, 0);
+    stroke-width: 5px;
+    cursor:pointer;
+}
+
+#controls{
+    position:fixed;
+    border: 1px solid snow;
+    padding:5px;
+    padding-top: 13px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    right: 5%;
+    top:40%;
+    gap: 20px;
+    flex-direction: column;
+    align-items: center;
+    z-index: 100;
+}
+.btn{
+    background: none;
+    border: none;
+    cursor:pointer;
+    padding:0
+}
+.btn img{
+    width: 40px;
+    height: 40px;
+    transition: transform 0.2s;
+}
+
+.btn:hover img {
+    transform: scale(1.1);
 }

@@ -1,16 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Titan's Circuit</title>
     <link href="style.css" rel="stylesheet">
 </head>
+
 <body>
-    <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-        <svg width="650" height="650">
+    <div id="gametime-container">
+        <div id="gametime">05:00</div>
+    </div>
+    <div id="window">
+        <svg id="svg" width="650" height="650">
         </svg>
     </div>
+    <div id="game-status">
+        <span id="current-player">Red</span>'s Turn
+    </div>
+    <div id="timer">
+        Turn Timer: <span id="turn-timer">00</span>
+    </div>
+
+    <div id="controls">
+        <button id="reset-btn" class="btn" > <img src="Assets/noun-reset-6095982.png"> </button>
+        <button id="pause-btn" class="btn" > <img src="Assets/noun-pause-1507476.png"></button>
+        <button id="resume-btn" class="btn" > <img src="Assets/noun-play-1334661.png"> </button>
+    </div>    
+
+    <div id="scoreR">
+        Red Score : <span id="red-titans">0</span>
+    </div>
+    <div id="scoreB">
+        Blue Score : <span id="blue-titans">0</span>
+    </div>
+    <audio id="move-sound" src="Assets/pop.mp3" preload="auto"></audio>
     <script src="script.js"></script>
 </body>
+
 </html>
