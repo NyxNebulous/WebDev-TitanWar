@@ -1,26 +1,31 @@
-body{
+body {
     background-image: url("Assets/Lofi_Aesthetic.jpg");
     background-repeat: no-repeat;
     background-size: cover;
 }
+
 .position {
     cursor: pointer;
     transition: fill 0.2s;
 }
+
 .position:hover {
     stroke-width: 5px;
-    stroke:rgb(23, 235, 94);
+    stroke: rgb(23, 235, 94);
 }
 
-#window{
-    display: flex; 
-    justify-content:space-evenly;
-    margin-top: 58px;
-    height: 84vh;
+#window {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 5vh;
+    height: 87vh;
 }
 
-#svg{
-    stroke:aqua;
+#svg {
+    width: min(72vw, 72vh);
+    height: min(72vw, 72vh);
+    stroke: aqua;
+    transform: scale(0.9);
 }
 
 #game-status {
@@ -28,104 +33,112 @@ body{
     top: 30px;
     left: 30px;
     font-weight: bold;
-    background: rgba(250, 254, 255, 0.9);
-    padding: 10px;
-    border: 10px solid #000000;
-    border-radius: 5px;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    box-shadow: 10 10 10px rgba(0,0,0,0.2);
-}
 
-#scoreR{
-    position: fixed;
-    bottom: 10%;
-    left: 30%;
-    font-weight: bold;
-    background: rgba(250, 254, 255, 0.9);
-    width:130px;
-    text-align: center;
-    padding: 10px;
-    border: 10px solid #000000;
-    border-radius: 5px;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    box-shadow: 10 10 10px rgba(0,0,0,0.2);
-}
-
-#scoreB{
-    position: fixed;
-    bottom: 10%;
-    right: 30%;
-    font-weight: bold;
-    width:130px;
+    width: 110px;
     text-align: center;
     background: rgba(250, 254, 255, 0.9);
     padding: 10px;
     border: 10px solid #000000;
     border-radius: 5px;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    box-shadow: 10 10 10px rgba(0,0,0,0.2);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 10 10 10px rgba(0, 0, 0, 0.2);
 }
 
-#timer{
+#scoreR {
+    position: fixed;
+    bottom: 10%;
+    left: 25%;
+    font-weight: bold;
+    background: rgba(250, 254, 255, 0.9);
+    width: 130px;
+    text-align: center;
+    padding: 10px;
+    border: 10px solid #000000;
+    border-radius: 5px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 10 10 10px rgba(0, 0, 0, 0.2);
+}
+
+#scoreB {
+    position: fixed;
+    bottom: 10%;
+    right: 25%;
+    font-weight: bold;
+    width: 130px;
+    text-align: center;
+    background: rgba(250, 254, 255, 0.9);
+    padding: 10px;
+    border: 10px solid #000000;
+    border-radius: 5px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 10 10 10px rgba(0, 0, 0, 0.2);
+}
+
+#timer {
     position: fixed;
     top: 30px;
-    right:30px;
+    right: 30px;
+    width: 110px;
+    text-align: center;
     justify-content: center;
     font-weight: bold;
     background: rgba(250, 254, 255, 0.9);
     padding: 10px;
     border: 10px solid #000000;
     border-radius: 5px;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    box-shadow: 10 10 10px rgba(0,0,0,0.2);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 10 10 10px rgba(0, 0, 0, 0.2);
 }
 
-#gametime-container{
+#gametime-container {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 50px;
-    height:50px;
+    height: 50px;
 }
-#gametime{
+
+#gametime {
     position: fixed;
     width: 150px;
     text-align: center;
     color: white;
     font-weight: bold;
-    font-size: 55px;
+    font-size: 65px;
     padding: 10px;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
 
 .highlight-option {
     stroke: rgb(255, 255, 0);
     stroke-width: 5px;
-    cursor:pointer;
+    cursor: pointer;
 }
 
-#controls{
-    position:fixed;
+#controls {
+    position: fixed;
     border: 1px solid snow;
-    padding:5px;
+    padding: 5px;
     padding-top: 13px;
     border-radius: 5px;
     display: flex;
     justify-content: center;
     right: 5%;
-    top:40%;
+    top: 40%;
     gap: 20px;
     flex-direction: column;
     align-items: center;
     z-index: 100;
 }
-.btn{
+
+.btn {
     background: none;
     border: none;
-    cursor:pointer;
-    padding:0
+    cursor: pointer;
+    padding: 0
 }
-.btn img{
+
+.btn img {
     width: 40px;
     height: 40px;
     transition: transform 0.2s;
@@ -133,4 +146,161 @@ body{
 
 .btn:hover img {
     transform: scale(1.1);
+}
+
+#message-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: lighter;
+    font-size: 1.9rem;
+    padding: 30px 60px;
+    border: 3px solid black;
+    border-radius: 10px;
+    z-index: 3000;
+    display: none;
+    animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -400%) scale(0.4);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -80%) scale(1);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -80%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -400%) scale(0.8);
+    }
+}
+
+
+
+@media only screen and (max-width: 900px) {
+    body {
+        background-size: cover;
+    }
+
+    #window {
+        display: flex;
+        justify-content: space-evenly;
+        margin-top: 6vh;
+        height: 84vh;
+    }
+
+    #svg {
+        width: min(72vw, 72vh);
+        height: min(72vw, 72vh);
+    }
+
+    #controls {
+        position: fixed;
+        left: 50%;
+        right: 50%;
+        top: 75%;
+        justify-self: center;
+        padding-left: 7px;
+        padding-top: 7px;
+        padding-bottom: 1px;
+        flex-direction: row;
+    }
+
+    #scoreR {
+        left: 55%;
+        transform: scale(calc(1000vw/100));
+    }
+
+    #scoreB {
+        right: 55%;
+    }
+
+}
+
+
+@media only screen and (max-height: 950px) {
+
+    #window {
+        display: flex;
+        justify-content: space-evenly;
+        margin-top: 0vh;
+        height: 89vh;
+    }
+
+    #svg {
+        width: min(72vw, 72vh);
+        height: min(72vw, 72vh);
+        margin-bottom: 90vh;
+    }
+
+    #scoreR {
+        left: 51%;
+    }
+
+    #scoreB {
+        right: 51%;
+    }
+}
+
+
+@media only screen and (max-width: 600px) {
+    body {
+        background-position: center;
+    }
+
+    #window {
+        margin-top: 12vh;
+        height: 84vh;
+    }
+
+    #svg {
+        width: min(90vw, 90vh);
+        height: min(90vw, 90vh);
+    }
+
+    #game-status {
+        top: 15vh;
+        left: 5vw;
+        transform: scale(0.72);
+    }
+
+    #timer {
+        top: 15vh;
+        right: 5vw;
+        transform: scale(0.72);
+    }
+
+    #scoreR {
+        transform: scale(0.72);
+
+    }
+
+    #scoreB {
+        transform: scale(0.72);
+
+    }
+
+    #controls{
+        transform: scale(0.72);
+    }
+
+    #gametime{
+        transform: scale(0.72);
+
+    }
+
+
 }

@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const svg = document.querySelector("svg");
     let layerIndex = [0, 1, 2];
-    const cx = 325;
-    const cy = 325;
     let hexCr = [];
     let neighbours = [];
     let playerTitans = { red: 0, blue: 0 };
@@ -12,6 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let gameTimer;
     let turnTimer;
     let timeLeft = 21;
+    let paused = false;
+    let phase2 = false;
+
+    const svg = document.querySelector("svg");
+    const cx = 325;
+    const cy = 325;
 
     layerIndex.forEach((layer) => {
         const r = (layer + 1) * 100;
@@ -24,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         hexCr.push(layerArr);
     });
+
 
     layerIndex.forEach(i => {
         addHex(i);
@@ -47,12 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
         neighbours.push(layers);
     }
 
-    startGameTimer();
 
     svg.addEventListener("click", (event) => {
         const circle = event.target.closest(".position");
         if (!circle) return;
-
+        if (paused) return;
         const isFilled = circle.getAttribute("fill") === "#000000" ? 0 :
             circle.getAttribute("fill") === "red" ? 1 : 2;
         gameStart(circle, isFilled);
@@ -62,6 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function gameStart(circle, isFilled) {
         const layerId = Number(circle.getAttribute("layer-id"));
         const curPlColor = curPlayer === 1 ? "red" : "blue";
+        startGameTimer();
+        startTurnTimer();
 
         if (playerTitans[curPlColor] < 4 && isFilled === 0) {
             if (layerId === 2 || (layerId === 1 && unlock1 >= 6)) {
@@ -73,8 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 curPlayer = 3 - curPlayer;
                 updateStatus(true);
                 if (playerTitans.red + playerTitans.blue === 8) {
-                    startTurnTimer();
-                    console.log("All 8 Titans placed. Starting turn timer...");
+                    console.log("All 8 Titans placed");
                 }
                 return;
             }
@@ -92,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const layer = Number(c.getAttribute("layer-id"));
                 if (layer === 1) blueCenter++;
             });
-            if (redCenter + blueCenter === 6) {
+            if (redCenter + blueCenter >= 6) {
                 unlock0 = true;
             }
             else return;
@@ -135,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             });
         }
+        titanEliminate(targetCircle);
     }
 
     function addHex(layer) {
@@ -236,6 +241,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 sound.play();
             }
         }
+        const turn = document.getElementById("game-status");
+        const timer = document.getElementById("timer");
+        if (curPlayer == 1) {
+            turn.style.backgroundColor = "rgba(247, 84, 84, 0.74)";
+            timer.style.backgroundColor = "rgba(251, 68, 68, 0.76)";
+        } else {
+            turn.style.backgroundColor = "rgba(68, 62, 252, 0.66)";
+            timer.style.backgroundColor = "rgba(52, 45, 245, 0.65)";
+        }
+        titanEliminate();
     }
 
     function moveTitan(fromCircle, toCircle, color) {
@@ -260,16 +275,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function startTurnTimer() {
+    function startTurnTimer(initialTime = 20) {
         const curPlColor = curPlayer === 1 ? "red" : "blue";
         clearInterval(turnTimer);
-        timeLeft = 20;
+        timeLeft = initialTime;
         turnTimer = setInterval(() => {
             timeLeft--;
             document.getElementById("turn-timer").textContent = timeLeft.toString().padStart(2, 0);
             if (timeLeft <= 0) {
                 clearInterval(turnTimer);
-                window.alert(`Time's up!! Skipping ${curPlColor}'s turn...`);
+                showMessage(`Skipping turn...`);
                 curPlayer = 3 - curPlayer;
                 updateStatus();
                 startTurnTimer();
@@ -283,7 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (gameTime <= 0) {
                 clearInterval(gameTimer);
                 clearInterval(turnTimer);
-                window.alert("Game Over!");
+                showMessage("Game Over!");
             }
             gameTime--;
             let secLeft = (gameTime % 60).toString().padStart(2, '0');
@@ -331,7 +346,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += point / 2;
             }
         });
-
         return score;
     }
 
@@ -360,8 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             clearInterval(gameTimer);
             clearInterval(turnTimer);
-            window.alert("Center is filled!");
-            window.alert(`${color.toUpperCase()} is the WINNER!!!`);
+            showMessage("Center is filled!");
+            showMessage(`${color.toUpperCase()} is the WINNER!!!`);
         }
         else if (gameTime <= 0) {
             const redScore = calScore(1);
@@ -371,10 +385,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
             clearInterval(gameTimer);
             clearInterval(turnTimer);
-            window.alert("Time's Up!!");
-            window.alert(`${color.toUpperCase()} is the WINNER!!!`);
+            showMessage("Time's Up!!");
+            showMessage(`${color.toUpperCase()} is the WINNER!!!`);
         }
     }
+
+    function titanEliminate() {
+        const oppPlColor = curPlayer === 2 ? "red" : "blue";
+        const curPlColor = curPlayer === 1 ? "red" : "blue";
+        const circles = document.querySelectorAll(`.position`);
+        circles.forEach((element) => {
+            const indexId = Number(element.getAttribute("index-id"));
+            const layerId = Number(element.getAttribute("layer-id"));
+            const adjacent = neighbours[layerId][indexId];
+            if (adjacent['joint'] && element.getAttribute("fill") == curPlColor) {
+                const adj1 = document.getElementById(`${adjacent['joint'].layer}${adjacent['joint'].index}`);
+                const adj2 = document.getElementById(`${adjacent['right'].layer}${adjacent['right'].index}`);
+                const adj3 = document.getElementById(`${adjacent['left'].layer}${adjacent['left'].index}`);
+                if (adj1.getAttribute("fill") == oppPlColor && adj2.getAttribute("fill") == oppPlColor && adj3.getAttribute("fill") == oppPlColor) {
+                    element.setAttribute("fill", "#000000");
+                    showMessage(`${curPlColor.toUpperCase()} eliminated`);
+                }
+            }
+        });
+    }
+
+    function showMessage(text, duration = 2000) {
+        const box = document.getElementById('message-box');
+        box.innerText = text;
+        box.style.display = 'block';
+        
+        setTimeout(() => {
+            box.style.display = 'none';
+        }, duration);
+    }    
 
     // RESET button 
     document.getElementById("reset-btn").addEventListener("click", () => {
@@ -403,17 +447,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // PAUSE button 
-    document.getElementById("pause-btn").addEventListener("click", () => {
+    document.getElementById("pause-btn").addEventListener("click", (event) => {
+        showMessage("Paused!");
         clearInterval(gameTimer);
         clearInterval(turnTimer);
+        paused = true;
     });
 
     // RESUME button 
     document.getElementById("resume-btn").addEventListener("click", () => {
+        showMessage("Resumed!");
         startGameTimer();
-        if (playerTitans.red + playerTitans.blue === 8) {
-            startTurnTimer();
-        }
+        startTurnTimer(timeLeft);
+        paused = false;
     });
 
 });
