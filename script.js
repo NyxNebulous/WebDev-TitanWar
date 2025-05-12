@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let turnTimer;
     let timeLeft = 21;
     let paused = false;
-    let phase2 = false;
+    let clickLocked = false;
 
     const svg = document.querySelector("svg");
     const cx = 325;
@@ -54,8 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     svg.addEventListener("click", (event) => {
         const circle = event.target.closest(".position");
-        if (!circle) return;
-        if (paused) return;
+        if (!circle || paused || clickLocked) return;
         const isFilled = circle.getAttribute("fill") === "#000000" ? 0 :
             circle.getAttribute("fill") === "red" ? 1 : 2;
         gameStart(circle, isFilled);
@@ -66,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const layerId = Number(circle.getAttribute("layer-id"));
         const curPlColor = curPlayer === 1 ? "red" : "blue";
         startGameTimer();
-        startTurnTimer();
 
         if (playerTitans[curPlColor] < 4 && isFilled === 0) {
             if (layerId === 2 || (layerId === 1 && unlock1 >= 6)) {
@@ -77,9 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (unlock1 === 6) console.log("1st layer unlocked");
                 curPlayer = 3 - curPlayer;
                 updateStatus(true);
-                if (playerTitans.red + playerTitans.blue === 8) {
-                    console.log("All 8 Titans placed");
-                }
+                
+                startTurnTimer();
                 return;
             }
         }
@@ -127,11 +124,12 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (validOptions.length > 1) {
             validOptions.forEach((neigh) => {
                 neigh.classList.add("highlight-option");
-
+                clickLocked = true;
                 const handler = function (e) {
                     e.stopPropagation(); //  Prevents the click from affecting other elements 
                     clearHighlights();
                     moveTitan(neigh, targetCircle, curPlColor);
+                    clickLocked = false;
                 };
 
                 neigh.addEventListener("click", handler);
