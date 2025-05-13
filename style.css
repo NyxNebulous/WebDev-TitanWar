@@ -2,6 +2,7 @@ body {
     background-image: url("Assets/Lofi_Aesthetic.jpg");
     background-repeat: no-repeat;
     background-size: cover;
+    overflow: hidden;
 
 }
 
@@ -194,8 +195,7 @@ body {
 @media only screen and (max-width: 900px) {
     body {
         background-size: cover;
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow: hidden;
     }
 
     #window {
@@ -238,8 +238,7 @@ body {
 
     body {
         background-size: cover;
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow: hidden;
     }
     
     #window {
@@ -267,8 +266,7 @@ body {
 @media only screen and (max-width: 600px) {
     body {
         background-position: center;
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow: hidden;
     }
 
     #window {
