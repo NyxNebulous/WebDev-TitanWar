@@ -2,6 +2,7 @@ body {
     background-image: url("Assets/Lofi_Aesthetic.jpg");
     background-repeat: no-repeat;
     background-size: cover;
+
 }
 
 .position {
@@ -193,6 +194,8 @@ body {
 @media only screen and (max-width: 900px) {
     body {
         background-size: cover;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     #window {
@@ -233,6 +236,12 @@ body {
 
 @media only screen and (max-height: 950px) {
 
+    body {
+        background-size: cover;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
     #window {
         display: flex;
         justify-content: space-evenly;
@@ -255,10 +264,11 @@ body {
     }
 }
 
-
 @media only screen and (max-width: 600px) {
     body {
         background-position: center;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     #window {
@@ -293,11 +303,11 @@ body {
 
     }
 
-    #controls{
+    #controls {
         transform: scale(0.72);
     }
 
-    #gametime{
+    #gametime {
         transform: scale(0.72);
 
     }
