@@ -10,7 +10,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let turnTimer;
     let timeLeft = 21;
     let paused = false;
-    let clickLocked = false;
+    let validOptions = [];
+    let toCircle;
+    let highlightCase = false;
+    let unlocked1st = false;
+    const centreCount = {
+        redCentre: 0,
+        blueCentre: 0,
+    };
 
     const svg = document.querySelector("svg");
     const cx = 325;
@@ -54,7 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     svg.addEventListener("click", (event) => {
         const circle = event.target.closest(".position");
-        if (!circle || paused || clickLocked) return;
+        if (!circle || paused) return;
+        if (highlightCase) {
+            moveHighlighted(event, circle);
+            return;
+        }
         const isFilled = circle.getAttribute("fill") === "#000000" ? 0 :
             circle.getAttribute("fill") === "red" ? 1 : 2;
         gameStart(circle, isFilled);
@@ -65,38 +76,43 @@ document.addEventListener("DOMContentLoaded", () => {
         const layerId = Number(circle.getAttribute("layer-id"));
         const curPlColor = curPlayer === 1 ? "red" : "blue";
         startGameTimer();
-
-        if (playerTitans[curPlColor] < 4 && isFilled === 0) {
+        if (playerTitans[curPlColor] < 4 && isFilled === 0 && !unlocked1st) {
             if (layerId === 2 || (layerId === 1 && unlock1 >= 6)) {
                 circle.setAttribute("fill", curPlColor);
                 circle.classList.add(`${curPlColor}`);
                 playerTitans[curPlColor]++;
                 if (layerId === 2) unlock1++;
                 if (unlock1 === 6) console.log("1st layer unlocked");
+                if (playerTitans["red"] + playerTitans["blue"] == 8) unlocked1st = true;
                 curPlayer = 3 - curPlayer;
                 updateStatus(true);
-                
                 startTurnTimer();
                 return;
             }
         }
         else if (layerId === 0 && !unlock0) {
+            centreCount["redCentre"] = 0;
+            centreCount["blueCentre"] = 0;
+
             const redTitans = document.querySelectorAll(".red");
             const blueTitans = document.querySelectorAll(".blue");
-            let redCenter = 0;
-            let blueCenter = 0;
+
             redTitans.forEach(c => {
                 const layer = Number(c.getAttribute("layer-id"));
-                if (layer === 1) redCenter++;
+                if (layer === 1) centreCount["redCentre"]++;
             });
+
             blueTitans.forEach(c => {
                 const layer = Number(c.getAttribute("layer-id"));
-                if (layer === 1) blueCenter++;
+                if (layer === 1) centreCount["blueCentre"]++;
             });
-            if (redCenter + blueCenter >= 6) {
+
+            if (centreCount["redCentre"] + centreCount["blueCentre"] >= 6) {
                 unlock0 = true;
+                console.log("Central layer unlocked!");
+            } else {
+                return;
             }
-            else return;
         }
         gamePlay(circle, isFilled);
     }
@@ -108,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const layerId = Number(targetCircle.getAttribute("layer-id"));
         const adjacent = neighbours[layerId][indexId];
 
-        let validOptions = [];
+        validOptions = [];
 
         for (const dir of ['joint', 'right', 'left']) {
             const adj = adjacent[dir];
@@ -124,17 +140,9 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (validOptions.length > 1) {
             validOptions.forEach((neigh) => {
                 neigh.classList.add("highlight-option");
-                clickLocked = true;
-                const handler = function (e) {
-                    e.stopPropagation(); //  Prevents the click from affecting other elements 
-                    clearHighlights();
-                    moveTitan(neigh, targetCircle, curPlColor);
-                    clickLocked = false;
-                };
-
-                neigh.addEventListener("click", handler);
-                neigh._chooseListener = handler;
-
+                toCircle = targetCircle;
+                highlightCase = true;
+                return;
             });
         }
         titanEliminate(targetCircle);
@@ -262,15 +270,28 @@ document.addEventListener("DOMContentLoaded", () => {
         gameEnd();
     }
 
-    function clearHighlights() {
-        const highlighted = document.querySelectorAll(".highlight-option");
-        highlighted.forEach((el) => {
-            el.classList.remove("highlight-option");
-            if (el._chooseListener) {
-                el.removeEventListener("click", el._chooseListener);
-                delete el._chooseListener;
+    function moveHighlighted(event, circle) {
+        const curPlColor = curPlayer === 1 ? "red" : "blue";
+        if (!event.target.closest(".highlight-option")) {
+            validOptions.forEach((neigh) => {
+                neigh.classList.remove("highlight-option");
+            });
+            highlightCase = false;
+            return;
+        }
+        else {
+            validOptions.forEach((neigh) => {
+                neigh.classList.remove("highlight-option");
+            });
+            if (toCircle.classList.contains(curPlColor)) {
+                console.log("You can't move onto your own Titan!");
+                return;
             }
-        });
+
+            moveTitan(circle, toCircle, curPlColor);
+            highlightCase = false;
+            return;
+        }
     }
 
     function startTurnTimer(initialTime = 20) {
@@ -364,6 +385,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (layer === 0) blueCenter++;
         });
 
+
         if (redCenter + blueCenter === 6) {
             const redScore = calScore(1);
             const blueScore = calScore(2);
@@ -386,37 +408,68 @@ document.addEventListener("DOMContentLoaded", () => {
             showMessage("Time's Up!!");
             showMessage(`${color.toUpperCase()} is the WINNER!!!`);
         }
+
+        if (unlock1 >= 6) {
+            if (playerTitans["red"] < 2) {
+                showMessage(`BLUE is the WINNER!!!`);
+
+                clearInterval(gameTimer);
+                clearInterval(turnTimer);
+            }
+            else if (playerTitans["blue"] < 2) {
+                showMessage(`RED is the WINNER!!!`);
+
+                clearInterval(gameTimer);
+                clearInterval(turnTimer);
+            }
+        }
     }
 
     function titanEliminate() {
         const oppPlColor = curPlayer === 2 ? "red" : "blue";
         const curPlColor = curPlayer === 1 ? "red" : "blue";
         const circles = document.querySelectorAll(`.position`);
+
         circles.forEach((element) => {
             const indexId = Number(element.getAttribute("index-id"));
             const layerId = Number(element.getAttribute("layer-id"));
             const adjacent = neighbours[layerId][indexId];
-            if (adjacent['joint'] && element.getAttribute("fill") == curPlColor) {
+
+            if (adjacent['joint'] && element.getAttribute("fill") === curPlColor) {
                 const adj1 = document.getElementById(`${adjacent['joint'].layer}${adjacent['joint'].index}`);
                 const adj2 = document.getElementById(`${adjacent['right'].layer}${adjacent['right'].index}`);
                 const adj3 = document.getElementById(`${adjacent['left'].layer}${adjacent['left'].index}`);
-                if (adj1.getAttribute("fill") == oppPlColor && adj2.getAttribute("fill") == oppPlColor && adj3.getAttribute("fill") == oppPlColor) {
+
+                if (
+                    adj1.getAttribute("fill") === oppPlColor &&
+                    adj2.getAttribute("fill") === oppPlColor &&
+                    adj3.getAttribute("fill") === oppPlColor
+                ) {
                     element.setAttribute("fill", "#000000");
-                    showMessage(`${curPlColor.toUpperCase()} eliminated`);
+                    element.classList.remove("red", "blue");
+
+                    if (layerId === 1) {
+                        centreCount[`${curPlColor}Centre`]--;
+                    }
+
+                    playerTitans[curPlColor]--;
+                    showMessage(`${curPlColor.toUpperCase()} Titan eliminated!`);
                 }
             }
         });
+        gameEnd();
     }
+
 
     function showMessage(text, duration = 2000) {
         const box = document.getElementById('message-box');
         box.innerText = text;
         box.style.display = 'block';
-        
+
         setTimeout(() => {
             box.style.display = 'none';
         }, duration);
-    }    
+    }
 
     // RESET button 
     document.getElementById("reset-btn").addEventListener("click", () => {
