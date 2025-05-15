@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
         redCentre: 0,
         blueCentre: 0,
     };
+    let moveHistory = [];
+    let redoList = [];
 
     const svg = document.querySelector("svg");
     const cx = 325;
@@ -78,14 +80,10 @@ document.addEventListener("DOMContentLoaded", () => {
         startGameTimer();
         if (playerTitans[curPlColor] < 4 && isFilled === 0 && !unlocked1st) {
             if (layerId === 2 || (layerId === 1 && unlock1 >= 6)) {
-                circle.setAttribute("fill", curPlColor);
-                circle.classList.add(`${curPlColor}`);
-                playerTitans[curPlColor]++;
+                placeTitan(circle, curPlColor);
                 if (layerId === 2) unlock1++;
                 if (unlock1 === 6) console.log("1st layer unlocked");
                 if (playerTitans["red"] + playerTitans["blue"] == 8) unlocked1st = true;
-                curPlayer = 3 - curPlayer;
-                updateStatus(true);
                 startTurnTimer();
                 return;
             }
@@ -115,6 +113,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         gamePlay(circle, isFilled);
+    }
+
+    function placeTitan(circle, color) {
+        redoList = [];
+        const from = {
+            layer: circle.getAttribute("layer-id"),
+            index: circle.getAttribute("index-id"),
+        };
+        circle.setAttribute("fill", color);
+        circle.classList.add(color);
+        moveHistory.push({ color: `${color}`, from });
+        playerTitans[color]++;
+        updateStatus(true);
+        curPlayer = 3 - curPlayer;
     }
 
     function gamePlay(targetCircle, isFilled) {
@@ -242,29 +254,39 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(calScore(1), calScore(2));
         if (didMove) {
             const sound = document.getElementById("move-sound");
-            if (sound) {
-                sound.currentTime = 0;
-                sound.play();
-            }
+            sound.currentTime = 0;
+            sound.play();
         }
         const turn = document.getElementById("game-status");
         const timer = document.getElementById("timer");
         if (curPlayer == 1) {
-            turn.style.backgroundColor = "rgba(247, 84, 84, 0.74)";
+            turn.style.backgroundColor = "rgba(251, 68, 68, 0.76)";
             timer.style.backgroundColor = "rgba(251, 68, 68, 0.76)";
         } else {
-            turn.style.backgroundColor = "rgba(68, 62, 252, 0.66)";
+            turn.style.backgroundColor = "rgba(52, 45, 245, 0.65)";
             timer.style.backgroundColor = "rgba(52, 45, 245, 0.65)";
         }
         titanEliminate();
     }
 
     function moveTitan(fromCircle, toCircle, color) {
+        redoList = [];
+        const from = {
+            layer: fromCircle.getAttribute("layer-id"),
+            index: fromCircle.getAttribute("index-id"),
+        };
+        const to = {
+            layer: toCircle.getAttribute("layer-id"),
+            index: toCircle.getAttribute("index-id"),
+        };
+
         fromCircle.setAttribute("fill", "#000000");
         fromCircle.classList.remove(`${color}`);
         toCircle.setAttribute("fill", color);
         toCircle.classList.add(`${color}`);
         curPlayer = 3 - curPlayer;
+
+        moveHistory.push({ color: `${color}`, from, to });
         updateStatus(true);
         startTurnTimer();
         gameEnd();
@@ -445,14 +467,26 @@ document.addEventListener("DOMContentLoaded", () => {
                     adj2.getAttribute("fill") === oppPlColor &&
                     adj3.getAttribute("fill") === oppPlColor
                 ) {
+                    moveHistory.push({
+                        color: curPlColor,
+                        from: {
+                            layer: element.getAttribute("layer-id"),
+                            index: element.getAttribute("index-id"),
+                        },
+                        eliminated: true
+                    });
+
                     element.setAttribute("fill", "#000000");
                     element.classList.remove("red", "blue");
+                    playerTitans[curPlColor]--;
+
+                    const sound = new Audio("Assets/destroyed.mp3");
+                    sound.play();
 
                     if (layerId === 1) {
                         centreCount[`${curPlColor}Centre`]--;
                     }
 
-                    playerTitans[curPlColor]--;
                     showMessage(`${curPlColor.toUpperCase()} Titan eliminated!`);
                 }
             }
@@ -473,6 +507,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // RESET button 
     document.getElementById("reset-btn").addEventListener("click", () => {
+
+        const sound = new Audio("Assets/click-21156.mp3");
+        sound.play();
+
         document.querySelectorAll(".position").forEach(circle => {
             circle.setAttribute("fill", "#000000");
             circle.classList.remove("red", "blue", "highlight-option");
@@ -487,8 +525,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         clearInterval(gameTimer);
         clearInterval(turnTimer);
+        moveHistory = [];
+        redoList = [];
 
         document.getElementById("current-player").textContent = "Red";
+        document.getElementById("game-status").style.backgroundColor = "rgba(251, 68, 68, 0.76)";
+        document.getElementById("timer").style.backgroundColor = "rgba(251, 68, 68, 0.76)";
         document.getElementById("red-titans").textContent = "0";
         document.getElementById("blue-titans").textContent = "0";
         document.getElementById("turn-timer").textContent = "20";
@@ -497,20 +539,140 @@ document.addEventListener("DOMContentLoaded", () => {
         startGameTimer();
     });
 
-    // PAUSE button 
-    document.getElementById("pause-btn").addEventListener("click", (event) => {
-        showMessage("Paused!");
-        clearInterval(gameTimer);
-        clearInterval(turnTimer);
-        paused = true;
+
+    // PAUSE or PLAY button
+    const toggleBtn = document.getElementById("toggle-btn");
+    const toggleIcon = document.getElementById("toggle-icon");
+
+    toggleBtn.addEventListener("click", () => {
+        const sound = new Audio("Assets/pause-piano-sound-40579.mp3");
+        sound.play();
+
+        paused = !paused;
+
+        if (paused) {
+            showMessage("Paused!");
+            clearInterval(gameTimer);
+            clearInterval(turnTimer);
+            toggleIcon.src = "Assets/noun-play-1334661.png";
+        } else {
+            showMessage("Resumed!");
+            startGameTimer();
+            startTurnTimer(timeLeft);
+            toggleIcon.src = "Assets/noun-pause-1507476.png";
+        }
     });
 
-    // RESUME button 
-    document.getElementById("resume-btn").addEventListener("click", () => {
-        showMessage("Resumed!");
-        startGameTimer();
-        startTurnTimer(timeLeft);
-        paused = false;
+
+    // History display
+    const historyOfMoves = document.getElementById("list-btn");
+    const overlay = document.getElementById("overlay-container");
+    const overlayClose = document.getElementById("overlay-close");
+
+    historyOfMoves.addEventListener("click", () => {
+        const sound = new Audio("Assets/click-21156.mp3");
+        sound.play();
+
+        overlay.style.display = "block";
+        const list = document.getElementById("moveList");
+        list.innerHTML = "";
+        moveHistory.forEach((element) => {
+            const newList = document.createElement("li");
+            if (element.to)
+                newList.textContent = `${element.color.toUpperCase()}: (${element.from.layer},${element.from.index}) --> (${element.to.layer},${element.to.index})`;
+            else if (element.eliminated)
+                newList.textContent = `${element.color.toUpperCase()}: (${element.from.layer},${element.from.index}) --> Eliminated`;
+            else
+                newList.textContent = `${element.color.toUpperCase()}: (${element.from.layer},${element.from.index})`;
+            list.appendChild(newList);
+            newList.style.color = "white";
+        });
     });
+
+    overlayClose.addEventListener("click", () => {
+        const sound = new Audio("Assets/remove-92075.mp3");
+        sound.play();
+        overlay.style.display = "none";
+    });
+
+    // Undo & Redo buttons
+    document.getElementById("undo-btn").addEventListener("click", undoMove);
+    document.getElementById("redo-btn").addEventListener("click", redoMove);
+
+    function undoMove() {
+        if (moveHistory.length === 0) return;
+
+        const sound = new Audio("Assets/click-21156.mp3");
+        sound.play();
+
+        const lastMove = moveHistory.pop();
+        redoList.push(lastMove);
+        if (lastMove.eliminated) {
+            const elCircle = document.getElementById(`${lastMove.from.layer}${lastMove.from.index}`);
+            elCircle.setAttribute("fill", lastMove.color);
+            elCircle.classList.add(lastMove.color);
+            playerTitans[lastMove.color]++;
+            curPlayer = 3 - curPlayer;
+            updateStatus();
+            return;
+        }        
+        if (lastMove.to) {
+            const fromCircle = document.getElementById(`${lastMove.from.layer}${lastMove.from.index}`);
+            const toCircle = document.getElementById(`${lastMove.to.layer}${lastMove.to.index}`);
+
+            toCircle.setAttribute("fill", "#000000");
+            toCircle.classList.remove(lastMove.color);
+
+            fromCircle.setAttribute("fill", lastMove.color);
+            fromCircle.classList.add(lastMove.color);
+        }
+        else {
+            const circle = document.getElementById(`${lastMove.from.layer}${lastMove.from.index}`);
+            circle.setAttribute("fill", "#000000");
+            circle.classList.remove(lastMove.color);
+            playerTitans[lastMove.color]--;
+        }
+
+        curPlayer = 3 - curPlayer;
+        updateStatus();
+    }
+
+    function redoMove() {
+        if (redoList.length === 0) return;
+
+        const sound = new Audio("Assets/click-21156.mp3");
+        sound.play();
+
+        const move = redoList.pop();
+        moveHistory.push(move);
+
+        if (move.eliminated) {
+            const elCircle = document.getElementById(`${move.from.layer}${move.from.index}`);
+            elCircle.setAttribute("fill", "#000000");
+            elCircle.classList.remove("red", "blue");
+            playerTitans[move.color]--;
+            curPlayer = 3 - curPlayer;
+            updateStatus();
+            return;
+        }        
+        if (move.to) {
+            const fromCircle = document.getElementById(`${move.from.layer}${move.from.index}`);
+            const toCircle = document.getElementById(`${move.to.layer}${move.to.index}`);
+
+            fromCircle.setAttribute("fill", "#000000");
+            fromCircle.classList.remove(move.color);
+
+            toCircle.setAttribute("fill", move.color);
+            toCircle.classList.add(move.color);
+        } else {
+            const circle = document.getElementById(`${move.from.layer}${move.from.index}`);
+            circle.setAttribute("fill", move.color);
+            circle.classList.add(move.color);
+            playerTitans[move.color]++;
+        }
+
+        curPlayer = 3 - curPlayer;
+        updateStatus();
+    }
 
 });

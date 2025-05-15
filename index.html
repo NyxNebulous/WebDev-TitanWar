@@ -10,11 +10,20 @@
 
 <body>
     <div id="message-box"></div>
+    <div id="overlay-container">
+        <div id="overlay-content">
+            <h2 align="center" style="color:white">MOVE HISTORY</h2>
+            <h5 align="center" style="color:white">Format: (layer [0,1,2], index [0,1,2,3,4,5,6])</h5>
+            <h5 align="center" style="color:white">Indexing: Anticlockwise</h5>
+            <ol id="moveList"></ol>
+            <button id="overlay-close">X</button>
+        </div>
+    </div>
     <div id="gametime-container">
         <div id="gametime">05:00</div>
     </div>
     <div id="window">
-        <svg id="svg" viewBox="0 0 650 650" >
+        <svg id="svg" viewBox="0 0 650 650">
         </svg>
     </div>
     <div id="game-status">
@@ -23,13 +32,17 @@
     <div id="timer">
         Turn Timer: <span id="turn-timer">00</span>
     </div>
-    
-    <div id="controls">
-        <button id="reset-btn" class="btn" > <img src="Assets/noun-reset-6095982.png"> </button>
-        <button id="pause-btn" class="btn" > <img src="Assets/noun-pause-1507476.png"></button>
-        <button id="resume-btn" class="btn" > <img src="Assets/noun-play-1334661.png"> </button>
-    </div>    
 
+    <div id="controls">
+        <button id="reset-btn" title="Reset" class="btn"> <img src="Assets/noun-reset-6095982.png"> </button>
+        <button id="undo-btn" class="btn"><img src="Assets/noun-undo-258784.png"></button>
+        <button id="toggle-btn" title="Play/Pause" class="btn">
+            <img id="toggle-icon" src="Assets/noun-pause-1507476.png" alt="Play">
+        </button>
+        <button id="redo-btn" class="btn"><img src="Assets/noun-redo-258782.png"></button>
+        <button id="list-btn" title="History of moves" class="btn"> <img src="Assets/noun-options-1508389.png">
+        </button>
+    </div>
     <div id="scoreR">
         Red Score : <span id="red-titans">0</span>
     </div>
@@ -37,7 +50,7 @@
         Blue Score : <span id="blue-titans">0</span>
     </div>
     <audio id="move-sound" src="Assets/pop.mp3" preload="auto"></audio>
-    <script src="script.js"></script>
+     <script src="script.js"></script>
 </body>
 
 </html>
