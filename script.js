@@ -515,7 +515,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // RESET button 
     document.getElementById("reset-btn").addEventListener("click", () => {
-
+        console.log("Reset button clicked");
         const sound = new Audio("Assets/click-21156.mp3");
         sound.play();
 
@@ -528,14 +528,19 @@ document.addEventListener("DOMContentLoaded", () => {
         playerTitans = { red: 0, blue: 0 };
         unlock0 = false;
         unlock1 = 0;
-        timeLeft = 21;
+        unlocked1st = false;
+        timeLeft = 20;
         gameTime = 300;
+        paused = false;
+        highlightCase = false;
+        validOptions = [];
+        centreCount.redCentre = 0;
+        centreCount.blueCentre = 0;
 
         clearInterval(gameTimer);
         clearInterval(turnTimer);
         moveHistory = [];
         redoList = [];
-
         document.getElementById("current-player").textContent = "Red";
         document.getElementById("game-status").style.backgroundColor = "rgba(251, 68, 68, 0.76)";
         document.getElementById("timer").style.backgroundColor = "rgba(251, 68, 68, 0.76)";
@@ -545,7 +550,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("gametime").textContent = "05:00";
 
         startGameTimer();
-        gameStart();
     });
 
 
