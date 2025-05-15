@@ -418,6 +418,8 @@ document.addEventListener("DOMContentLoaded", () => {
             clearInterval(turnTimer);
             showMessage("Center is filled!");
             showMessage(`${color.toUpperCase()} is the WINNER!!!`);
+            const sound = new Audio("Assets/victory-82997.mp3")
+            sound.play();
         }
         else if (gameTime <= 0) {
             const redScore = calScore(1);
@@ -429,17 +431,23 @@ document.addEventListener("DOMContentLoaded", () => {
             clearInterval(turnTimer);
             showMessage("Time's Up!!");
             showMessage(`${color.toUpperCase()} is the WINNER!!!`);
+            const sound = new Audio("Assets/victory-82997.mp3")
+            sound.play();
         }
 
         if (unlock1 >= 6) {
             if (playerTitans["red"] < 2) {
                 showMessage(`BLUE is the WINNER!!!`);
+                const sound = new Audio("Assets/victory-82997.mp3")
+                sound.play();
 
                 clearInterval(gameTimer);
                 clearInterval(turnTimer);
             }
             else if (playerTitans["blue"] < 2) {
                 showMessage(`RED is the WINNER!!!`);
+                const sound = new Audio("Assets/victory-82997.mp3")
+                sound.play();
 
                 clearInterval(gameTimer);
                 clearInterval(turnTimer);
@@ -537,6 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("gametime").textContent = "05:00";
 
         startGameTimer();
+        gameStart();
     });
 
 
@@ -615,7 +624,7 @@ document.addEventListener("DOMContentLoaded", () => {
             curPlayer = 3 - curPlayer;
             updateStatus();
             return;
-        }        
+        }
         if (lastMove.to) {
             const fromCircle = document.getElementById(`${lastMove.from.layer}${lastMove.from.index}`);
             const toCircle = document.getElementById(`${lastMove.to.layer}${lastMove.to.index}`);
@@ -654,7 +663,7 @@ document.addEventListener("DOMContentLoaded", () => {
             curPlayer = 3 - curPlayer;
             updateStatus();
             return;
-        }        
+        }
         if (move.to) {
             const fromCircle = document.getElementById(`${move.from.layer}${move.from.index}`);
             const toCircle = document.getElementById(`${move.to.layer}${move.to.index}`);
